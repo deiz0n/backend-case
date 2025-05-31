@@ -7,3 +7,24 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+enum Status {
+  ATIVO
+  INATIVO
+}
+
+model Cliente {
+  id     String @id @default(uuid())
+  nome   String 
+  email  String @unique
+  status Status @default(ATIVO)
+  ativos AtivoFinanceiro[]
+}
+
+model AtivoFinanceiro {
+  id         String @id @default(uuid())
+  nome       String
+  valorAtual Decimal
+  clienteId  String
+  cliente    Cliente @relation(fields: [clienteId], references: [id])
+}
