@@ -1,6 +1,6 @@
 import {ClienteRepository} from "./cliente.repository";
 import {clienteResponseSchema, criarClienteSchema, CriarClienteSchemaInput} from "./cliente.schema";
-import {ClienteExistenteError} from "./errors/ClienteExistenteError";
+import {ClienteExistenteError} from "../../core/errors/ClienteExistenteError";
 import {entidadeToResponse} from "../../core/utils/mapper/mapper";
 
 export class ClienteService {
