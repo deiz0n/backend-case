@@ -23,7 +23,7 @@ model Cliente {
 
 model AtivoFinanceiro {
   id         String @id @default(uuid())
-  nome       String
+  nome       String @unique
   valorAtual Decimal
   clienteId  String
   cliente    Cliente @relation(fields: [clienteId], references: [id])
