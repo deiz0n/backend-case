@@ -1,8 +1,9 @@
-import {ClienteController} from "./cliente.controller";
-import {FastifyInstance} from "fastify";
+import { ClienteController } from "./cliente.controller";
+import { FastifyInstance } from "fastify";
 import { zodToJsonSchema } from "zod-to-json-schema";
+import { z } from 'zod';
 
-import { criarClienteSchema } from "./cliente.schema";
+import {atualizarClienteSchema, criarClienteSchema} from "./cliente.schema";
 import {responseSchemaErro, responseSchemaSucesso} from "../../core/schemas/response.schema";
 
 export class ClienteRoutes {
@@ -37,6 +38,27 @@ export class ClienteRoutes {
                 },
             },
             (request, reply) => this.clienteController.criarClienteHandler(request, reply)
+        );
+    }
+
+    async atualizarCliente(fastify: FastifyInstance) {
+        fastify.put(
+            "/atualizar/:id",
+            {
+                schema: {
+                    body: zodToJsonSchema(atualizarClienteSchema),
+                    response: {
+                        200: zodToJsonSchema(responseSchemaSucesso),
+                        400: zodToJsonSchema(responseSchemaErro),
+                    },
+                    params: zodToJsonSchema(
+                        z.object({
+                            id: z.string().uuid()
+                        })
+                    ),
+                },
+            },
+            (request, reply) => this.clienteController.atualizarClienteHandler(request, reply)
         );
     }
 }
