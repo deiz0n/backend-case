@@ -47,7 +47,15 @@ export class ClienteService {
         if (eExistente) throw new ClienteExistenteError();
 
         const cliente = await this.clienteRepository.criar(data);
-        return entidadeToResponse(cliente, clienteResponseSchema);
+
+        const ativos = (cliente.ativos ?? []).map(ativo => ({
+            ...ativo,
+            valorAtual: typeof ativo.valorAtual === "object" && "toNumber" in ativo.valorAtual
+                ? ativo.valorAtual.toNumber()
+                : ativo.valorAtual
+        }));
+
+        return entidadeToResponse({ ...cliente, ativos }, clienteResponseSchema);
     }
 
     async atualizar(id: string, data: AtualizarClienteSchemaInput) {
