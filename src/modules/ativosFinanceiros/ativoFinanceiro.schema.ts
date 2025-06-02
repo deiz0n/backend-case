@@ -9,6 +9,8 @@ export const criarAtivoFinanceiroSchema = z.object({
     )
 })
 
+export type CriarAtivoFinanceiroInput = z.infer<typeof criarAtivoFinanceiroSchema>;
+
 export const ativoFinanceiroResponseShema = z.object({
     id: z.string().uuid(),
     nome: z.string().nonempty(
