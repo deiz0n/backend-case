@@ -1,6 +1,26 @@
 import { AtivoFinanceiroRepository } from "./ativoFinanceiro.repository";
 import { entidadeToResponse } from "../../core/utils/mapper/mapper";
-import { ativoFinanceiroResponseShema } from "./ativoFinanceiro.schema";
+import {
+    ativoFinanceiroResponseShema,
+    CriarAtivoFinanceiroInput,
+    criarAtivoFinanceiroSchema
+} from "./ativoFinanceiro.schema";
+import { ZodError, ZodSchema } from "zod";
+import { AtivoFinanceiroInvalidoError } from "../../core/errors/AtivoFinanceiroInvalidoError";
+import { AtivoFinanceiroExistenteError } from "../../core/errors/AtivoFinanceiroExistenteError";
+
+
+function validarAtivoFinanceiro<T>(schema: ZodSchema<T>, data: unknown) {
+    try {
+        return schema.parse(data);
+    } catch (error) {
+        if (error instanceof ZodError) {
+            const detalhes = error.errors?.[0]?.message || "Erro de validação";
+            throw new AtivoFinanceiroInvalidoError(detalhes);
+        }
+        throw error;
+    }
+}
 
 export class AtivoFinanceiroService {
     constructor(private ativoFinanceiroRepository: AtivoFinanceiroRepository) {}
@@ -9,5 +29,14 @@ export class AtivoFinanceiroService {
         const ativos = await this.ativoFinanceiroRepository.buscarTodos();
 
         return entidadeToResponse(ativos, ativoFinanceiroResponseShema);
+    }
+
+    async criar(data: CriarAtivoFinanceiroInput) {
+        validarAtivoFinanceiro(criarAtivoFinanceiroSchema, data);
+
+        const eExistente = await this.ativoFinanceiroRepository.buscarPorNome(data.nome);
+        if (eExistente) throw new AtivoFinanceiroExistenteError();
+
+        return entidadeToResponse(data, ativoFinanceiroResponseShema);
     }
 }
