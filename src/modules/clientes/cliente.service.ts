@@ -1,11 +1,27 @@
 import {ClienteRepository} from "./cliente.repository";
 import {
+    atualizarClienteSchema,
     AtualizarClienteSchemaInput,
-    clienteResponseSchema,
+    clienteResponseSchema, criarClienteSchema,
     CriarClienteSchemaInput
 } from "./cliente.schema";
 import {ClienteExistenteError} from "../../core/errors/ClienteExistenteError";
 import {entidadeToResponse} from "../../core/utils/mapper/mapper";
+import { ZodSchema, ZodError} from "zod";
+import { ClienteInvalidoError } from "../../core/errors/ClienteInvalidoError";
+
+
+function validarCliente<T>(schema: ZodSchema<T>, data: unknown) {
+    try {
+        return schema.parse(data);
+    } catch (error) {
+        if (error instanceof ZodError) {
+            const detalhes = error.errors?.[0]?.message || "Erro de validação";
+            throw new ClienteInvalidoError(detalhes);
+        }
+        throw error;
+    }
+}
 
 export class ClienteService {
     constructor(private clienteRepository: ClienteRepository) {}
@@ -25,16 +41,18 @@ export class ClienteService {
     }
 
     async criar(data: CriarClienteSchemaInput) {
-        const eExistente = await this.clienteRepository.buscarPorEmail(data.email);
+        validarCliente(criarClienteSchema, data);
 
+        const eExistente = await this.clienteRepository.buscarPorEmail(data.email);
         if (eExistente) throw new ClienteExistenteError();
 
         const cliente = await this.clienteRepository.criar(data);
-
         return entidadeToResponse(cliente, clienteResponseSchema);
     }
 
     async atualizar(id: string, data: AtualizarClienteSchemaInput) {
+        validarCliente(atualizarClienteSchema, data);
+
         const cliente = await this.clienteRepository.atualizar(id, data);
         const ativos = (cliente.ativos ?? []).map(ativo => ({
             ...ativo,
@@ -44,5 +62,4 @@ export class ClienteService {
         }));
         return entidadeToResponse({ ...cliente, ativos }, clienteResponseSchema);
     }
-
 }
