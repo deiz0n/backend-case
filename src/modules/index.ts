@@ -14,6 +14,7 @@ export class ModuloPrincipal {
         await fastify.register(async (instance) => {
             await this.clienteRoutes.criarCliente(instance);
             await this.clienteRoutes.buscarTodos(instance);
+            await this.clienteRoutes.atualizarCliente(instance);
         }, { prefix: "/clientes" });
     }
 }
