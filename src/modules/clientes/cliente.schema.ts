@@ -29,5 +29,5 @@ export const clienteResponseSchema = z.object({
         (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
     ),
     status: statusEnum,
-    // ativos: z.array(ativoFinanceiroResponseShema)
+    ativos: z.array(ativoFinanceiroResponseShema)
 });
