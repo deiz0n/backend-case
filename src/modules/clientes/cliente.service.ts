@@ -3,7 +3,8 @@ import {
     atualizarClienteSchema,
     AtualizarClienteSchemaInput,
     clienteResponseSchema, criarClienteSchema,
-    CriarClienteSchemaInput
+    CriarClienteSchemaInput,
+    statusEnum
 } from "./cliente.schema";
 import {ClienteExistenteError} from "../../core/errors/ClienteExistenteError";
 import {entidadeToResponse} from "../../core/utils/mapper/mapper";
@@ -63,6 +64,7 @@ export class ClienteService {
         validarCliente(atualizarClienteSchema, data);
 
         if (!await this.clienteRepository.buscarPorId(id)) throw new ClienteNaoEncontradoError(`O cliente com id: ${id} não foi encontrado`)
+        if (data.status !== "ATIVO" && data.status !== "INATIVO") throw new ClienteNaoEncontradoError(`Os valores para status são: ${statusEnum.Values}`)
 
         const cliente = await this.clienteRepository.atualizar(id, data);
         const ativos = (cliente.ativos ?? []).map(ativo => ({
