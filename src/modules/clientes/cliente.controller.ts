@@ -7,6 +7,29 @@ import { responseSchemaErro, responseSchemaSucesso } from "../../core/schemas/re
 export class ClienteController {
     constructor(private clienteService: ClienteService) {}
 
+    async buscarTodosHanlder(request: FastifyRequest, reply: FastifyReply) {
+        try {
+            const clientes = await this.clienteService.buscarTodos();
+            const response = {
+                mensagem: "Clientes encontrados com sucesso",
+                status: "200",
+                data: new Date().toISOString(),
+                dados: clientes
+            };
+            responseSchemaSucesso.parse(response);
+            return reply.status(200).send(response);
+        } catch (error) {
+            const response = {
+                mensagem: "Erro ao buscar clientes",
+                status: "500",
+                data: new Date().toISOString(),
+                detalhes: error instanceof Error ? error.message : ""
+            };
+            responseSchemaErro.parse(response);
+            return reply.status(500).send(response);
+        }
+    }
+
     async criarClienteHandler(request: FastifyRequest, reply: FastifyReply) {
         try {
             const data = criarClienteSchema.parse(request.body);
