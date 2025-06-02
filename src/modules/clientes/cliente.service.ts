@@ -9,6 +9,7 @@ import {ClienteExistenteError} from "../../core/errors/ClienteExistenteError";
 import {entidadeToResponse} from "../../core/utils/mapper/mapper";
 import { ZodSchema, ZodError} from "zod";
 import { ClienteInvalidoError } from "../../core/errors/ClienteInvalidoError";
+import {ClienteNaoEncontradoError} from "../../core/errors/ClienteNaoEncontradoError";
 
 
 function validarCliente<T>(schema: ZodSchema<T>, data: unknown) {
@@ -60,6 +61,8 @@ export class ClienteService {
 
     async atualizar(id: string, data: AtualizarClienteSchemaInput) {
         validarCliente(atualizarClienteSchema, data);
+
+        if (!await this.clienteRepository.buscarPorId(id)) throw new ClienteNaoEncontradoError(`O cliente com id: ${id} não foi encontrado`)
 
         const cliente = await this.clienteRepository.atualizar(id, data);
         const ativos = (cliente.ativos ?? []).map(ativo => ({

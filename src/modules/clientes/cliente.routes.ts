@@ -49,6 +49,7 @@ export class ClienteRoutes {
                     response: {
                         200: zodToJsonSchema(responseSchemaSucesso),
                         400: zodToJsonSchema(responseSchemaErro),
+                        404: zodToJsonSchema(responseSchemaErro),
                     },
                     params: zodToJsonSchema(
                         z.object({

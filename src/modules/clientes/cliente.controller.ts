@@ -4,6 +4,7 @@ import { ClienteExistenteError} from "../../core/errors/ClienteExistenteError";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { responseSchemaErro, responseSchemaSucesso } from "../../core/schemas/response.schema";
 import { ClienteInvalidoError } from "../../core/errors/ClienteInvalidoError";
+import {ClienteNaoEncontradoError} from "../../core/errors/ClienteNaoEncontradoError";
 
 export class ClienteController {
     constructor(private clienteService: ClienteService) {}
@@ -92,6 +93,16 @@ export class ClienteController {
             return reply.status(200).send(response);
         } catch (error) {
             if (error instanceof ClienteInvalidoError) {
+                const response = {
+                    mensagem: error.message,
+                    status: error.status.toString(),
+                    data: error.data.toISOString(),
+                    detalhes: error.detalhes
+                };
+                responseSchemaErro.parse(response);
+                return reply.status(error.status).send(response);
+            }
+            if (error instanceof ClienteNaoEncontradoError) {
                 const response = {
                     mensagem: error.message,
                     status: error.status.toString(),
