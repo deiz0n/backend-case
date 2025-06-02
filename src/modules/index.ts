@@ -13,6 +13,7 @@ export class ModuloPrincipal {
     async registrar(fastify: FastifyInstance) {
         await fastify.register(async (instance) => {
             await this.clienteRoutes.criarCliente(instance);
+            await this.clienteRoutes.buscarTodos(instance);
         }, { prefix: "/clientes" });
     }
 }
