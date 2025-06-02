@@ -1,4 +1,4 @@
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 import { ativoFinanceiroResponseShema } from '../ativosFinanceiros/ativos.schema';
 
@@ -17,19 +17,17 @@ export const criarClienteSchema = z.object({
         { message: "E-mail inválido" }
     ),
     status: statusEnum.default('ATIVO'),
-    ativos: z.array(ativoFinanceiroResponseShema).nonempty(
-        { message: "É necessário escolher ao menos 1 ativo financeiro" }
-    )
+    ativos: z.array(z.string().uuid()).optional().default([])
 });
 
 export type CriarClienteSchemaInput = z.infer<typeof criarClienteSchema>;
 
 export const clienteResponseSchema = z.object({
-    id: z.uuid(),
+    id: z.string().uuid(),
     nome: z.string(),
     email: z.string().nonempty().refine(
         (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
     ),
     status: statusEnum,
-    ativos: z.array(ativoFinanceiroResponseShema)
+    // ativos: z.array(ativoFinanceiroResponseShema)
 });
