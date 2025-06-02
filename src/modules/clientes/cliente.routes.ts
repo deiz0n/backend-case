@@ -29,7 +29,6 @@ export class ClienteRoutes {
             "/criar",
             {
                 schema: {
-                    body: zodToJsonSchema(criarClienteSchema),
                     response: {
                         201: zodToJsonSchema(responseSchemaSucesso),
                         400: zodToJsonSchema(responseSchemaErro),
