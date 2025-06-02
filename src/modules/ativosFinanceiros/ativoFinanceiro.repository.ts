@@ -6,6 +6,14 @@ export class AtivoFinanceiroRepository {
         return prisma.ativoFinanceiro.findMany();
     }
 
+    async buscarPorNome(nome: string) {
+        return prisma.ativoFinanceiro.findUnique({
+            where: {
+                nome: nome
+            }
+        })
+    }
+
     async criar(data: CriarAtivoFinanceiroInput) {
         return prisma.ativoFinanceiro.create({
             data: data
