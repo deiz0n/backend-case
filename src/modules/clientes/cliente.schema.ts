@@ -22,6 +22,15 @@ export const criarClienteSchema = z.object({
 
 export type CriarClienteSchemaInput = z.infer<typeof criarClienteSchema>;
 
+export const atualizarClienteSchema = z.object({
+    nome: z.string().min(10).optional(),
+    email: z.string().email().optional(),
+    status: statusEnum.optional(),
+    ativos: z.array(z.string().uuid()).optional()
+});
+
+export type AtualizarClienteSchemaInput = z.infer<typeof atualizarClienteSchema>;
+
 export const clienteResponseSchema = z.object({
     id: z.string().uuid(),
     nome: z.string(),
