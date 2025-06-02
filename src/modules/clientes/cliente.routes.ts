@@ -2,7 +2,8 @@ import {ClienteController} from "./cliente.controller";
 import {FastifyInstance} from "fastify";
 import { zodToJsonSchema } from "zod-to-json-schema";
 
-import { clienteResponseSchema, criarClienteSchema } from "./cliente.schema";
+import { criarClienteSchema } from "./cliente.schema";
+import {responseSchemaErro, responseSchemaSucesso} from "../../core/schemas/response.schema";
 
 export class ClienteRoutes {
     constructor(private clienteController: ClienteController) {}
@@ -14,7 +15,9 @@ export class ClienteRoutes {
                 schema: {
                     body: zodToJsonSchema(criarClienteSchema),
                     response: {
-                        201: zodToJsonSchema(clienteResponseSchema),
+                        201: zodToJsonSchema(responseSchemaSucesso),
+                        400: zodToJsonSchema(responseSchemaErro),
+                        500: zodToJsonSchema(responseSchemaErro),
                     },
                 },
             },

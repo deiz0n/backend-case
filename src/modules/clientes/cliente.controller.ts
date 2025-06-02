@@ -2,6 +2,7 @@ import { ClienteService } from "./cliente.service";
 import { criarClienteSchema } from "./cliente.schema";
 import { ClienteExistenteError} from "../../core/errors/ClienteExistenteError";
 import { FastifyReply, FastifyRequest } from "fastify";
+import { responseSchemaErro, responseSchemaSucesso } from "../../core/schemas/response.schema";
 
 export class ClienteController {
     constructor(private clienteService: ClienteService) {}
@@ -10,19 +11,44 @@ export class ClienteController {
         try {
             const data = criarClienteSchema.parse(request.body);
             const cliente = await this.clienteService.criar(data);
-            return reply.status(201).send(cliente);
+
+            const response = {
+                mensagem: "Cliente criado com sucesso",
+                status: "201",
+                data: new Date().toISOString(),
+                dados: cliente
+            };
+            responseSchemaSucesso.parse(response);
+            return reply.status(201).send(response);
         } catch (error) {
             if (error instanceof ClienteExistenteError) {
-                return reply.status(error.status).send({
-                    message: error.message,
-                    data: error.data,
-                    status: error.status
-                });
+                const response = {
+                    mensagem: error.message,
+                    status: error.status.toString(),
+                    data: new Date().toISOString(),
+                    detalhes: error.data ?? ""
+                };
+                responseSchemaErro.parse(response);
+                return reply.status(error.status).send(response);
             }
             if (error instanceof Error) {
-                return reply.status(400).send({ message: error.message });
+                const response = {
+                    mensagem: error.message,
+                    status: "400",
+                    data: new Date().toISOString(),
+                    detalhes: ""
+                };
+                responseSchemaErro.parse(response);
+                return reply.status(400).send(response);
             }
-            return reply.status(500).send({ message: "Erro interno do servidor" });
+            const response = {
+                mensagem: "Erro interno do servidor",
+                status: "500",
+                data: new Date().toISOString(),
+                detalhes: ""
+            };
+            responseSchemaErro.parse(response);
+            return reply.status(500).send(response);
         }
     }
 }
