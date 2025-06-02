@@ -16,7 +16,6 @@ export const criarClienteSchema = z.object({
         (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
         { message: "E-mail inválido" }
     ),
-    status: statusEnum.default('ATIVO'),
     ativos: z.array(z.string().uuid()).optional().default([])
 });
 
