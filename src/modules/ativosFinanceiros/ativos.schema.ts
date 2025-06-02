@@ -5,7 +5,7 @@ export const ativoFinanceiroResponseShema = z.object({
         { message: "Nome é obrigatório" }
     ),
     valorAtual: z.number().refine(
-        (val) => typeof val === 'number' && !isNaN(val),
+        (val) => !isNaN(val),
         { message: "Valor deve ser numérico" }
     )
 });
