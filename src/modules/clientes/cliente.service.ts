@@ -1,5 +1,9 @@
 import {ClienteRepository} from "./cliente.repository";
-import {clienteResponseSchema, criarClienteSchema, CriarClienteSchemaInput} from "./cliente.schema";
+import {
+    AtualizarClienteSchemaInput,
+    clienteResponseSchema,
+    CriarClienteSchemaInput
+} from "./cliente.schema";
 import {ClienteExistenteError} from "../../core/errors/ClienteExistenteError";
 import {entidadeToResponse} from "../../core/utils/mapper/mapper";
 
@@ -28,6 +32,17 @@ export class ClienteService {
         const cliente = await this.clienteRepository.criar(data);
 
         return entidadeToResponse(cliente, clienteResponseSchema);
+    }
+
+    async atualizar(id: string, data: AtualizarClienteSchemaInput) {
+        const cliente = await this.clienteRepository.atualizar(id, data);
+        const ativos = (cliente.ativos ?? []).map(ativo => ({
+            ...ativo,
+            valorAtual: typeof ativo.valorAtual === "object" && "toNumber" in ativo.valorAtual
+                ? ativo.valorAtual.toNumber()
+                : ativo.valorAtual
+        }));
+        return entidadeToResponse({ ...cliente, ativos }, clienteResponseSchema);
     }
 
 }
