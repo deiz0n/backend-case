@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -14,16 +13,16 @@ enum Status {
 }
 
 model Cliente {
-  id     String @id @default(uuid())
-  nome   String 
-  email  String @unique
-  status Status @default(ATIVO)
+  id     String            @id @default(uuid())
+  nome   String
+  email  String            @unique
+  status Status            @default(ATIVO)
   ativos AtivoFinanceiro[]
 }
 
 model AtivoFinanceiro {
-  id         String @id @default(uuid())
-  nome       String @unique
+  id         String  @id @default(uuid())
+  nome       String  @unique
   valorAtual Decimal
   clienteId  String
   cliente    Cliente @relation(fields: [clienteId], references: [id])
