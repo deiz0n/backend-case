@@ -1,5 +1,5 @@
 import { ClienteService } from "./cliente.service";
-import { criarClienteSchema } from "./cliente.schema";
+import { atualizarClienteSchema, AtualizarClienteSchemaInput, criarClienteSchema} from "./cliente.schema";
 import { ClienteExistenteError} from "../../core/errors/ClienteExistenteError";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { responseSchemaErro, responseSchemaSucesso } from "../../core/schemas/response.schema";
@@ -72,6 +72,32 @@ export class ClienteController {
             };
             responseSchemaErro.parse(response);
             return reply.status(500).send(response);
+        }
+    }
+
+    async atualizarClienteHandler(request: FastifyRequest, reply: FastifyReply) {
+        try {
+            const id = (request.params as any).id;
+            const data = atualizarClienteSchema.parse(request.body) as AtualizarClienteSchemaInput;
+            const cliente = await this.clienteService.atualizar(id, data);
+
+            const response = {
+                mensagem: "Cliente atualizado com sucesso",
+                status: "200",
+                data: new Date().toISOString(),
+                dados: cliente
+            };
+            responseSchemaSucesso.parse(response);
+            return reply.status(200).send(response);
+        } catch (error) {
+            const response = {
+                mensagem: "Erro ao atualizar cliente",
+                status: "400",
+                data: new Date().toISOString(),
+                detalhes: error instanceof Error ? error.message : ""
+            };
+            responseSchemaErro.parse(response);
+            return reply.status(400).send(response);
         }
     }
 }
