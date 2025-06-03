@@ -28,7 +28,12 @@ export class AtivoFinanceiroService {
     async buscarTodos() {
         const ativos = await this.ativoFinanceiroRepository.buscarTodos();
 
-        return entidadeToResponse(ativos, ativoFinanceiroResponseShema);
+        return ativos.map(ativo => {
+            const valorAtual = typeof ativo.valorAtual === "object" && "toNumber" in ativo.valorAtual
+                ? ativo.valorAtual.toNumber()
+                : ativo.valorAtual;
+            return entidadeToResponse({...ativo, valorAtual}, ativoFinanceiroResponseShema);
+        });
     }
 
     async criar(data: CriarAtivoFinanceiroInput) {
@@ -37,6 +42,12 @@ export class AtivoFinanceiroService {
         const eExistente = await this.ativoFinanceiroRepository.buscarPorNome(data.nome);
         if (eExistente) throw new AtivoFinanceiroExistenteError();
 
-        return entidadeToResponse(data, ativoFinanceiroResponseShema);
+        const ativoFinanceiro = await this.ativoFinanceiroRepository.criar(data);
+
+        const valorAtual = typeof ativoFinanceiro.valorAtual === "object" && "toNumber" in ativoFinanceiro.valorAtual
+            ? ativoFinanceiro.valorAtual.toNumber()
+            : ativoFinanceiro.valorAtual;
+
+        return entidadeToResponse({ ...ativoFinanceiro, valorAtual }, ativoFinanceiroResponseShema);
     }
 }
