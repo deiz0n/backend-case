@@ -9,5 +9,18 @@ services:
       - '3306:3306'
     volumes:
       - mysql-volume:/var/lib/mysql
+
+  app:
+    build: .
+    container_name: node-app
+    restart: always
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mysql-db
+    volumes:
+      - .:/usr/src/app
+    command: npm start
+
 volumes:
   mysql-volume:
