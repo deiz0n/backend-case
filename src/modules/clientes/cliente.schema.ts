@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { ativoFinanceiroResponseShema } from '../ativosFinanceiros/ativos.schema';
+import { ativoFinanceiroResponseShema } from '../ativosFinanceiros/ativoFinanceiro.schema';
 
 export const statusEnum = z.enum(['ATIVO', 'INATIVO']);
 
