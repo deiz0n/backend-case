@@ -8,6 +8,9 @@ import {
 import { ZodError, ZodSchema } from "zod";
 import { AtivoFinanceiroInvalidoError } from "../../core/errors/AtivoFinanceiroInvalidoError";
 import { AtivoFinanceiroExistenteError } from "../../core/errors/AtivoFinanceiroExistenteError";
+import {ClienteRepository} from "../clientes/cliente.repository";
+import { ClienteNaoEncontradoError } from "../../core/errors/ClienteNaoEncontradoError";
+import {AtivoFinanceiroNaoEncontrado} from "../../core/errors/AtivoFinanceiroNaoEncontrado";
 
 
 function validarAtivoFinanceiro<T>(schema: ZodSchema<T>, data: unknown) {
@@ -23,7 +26,10 @@ function validarAtivoFinanceiro<T>(schema: ZodSchema<T>, data: unknown) {
 }
 
 export class AtivoFinanceiroService {
-    constructor(private ativoFinanceiroRepository: AtivoFinanceiroRepository) {}
+    constructor(
+        private ativoFinanceiroRepository: AtivoFinanceiroRepository,
+        private clienteRepository: ClienteRepository
+    ) {}
 
     async buscarTodos() {
         const ativos = await this.ativoFinanceiroRepository.buscarTodos();
@@ -34,6 +40,28 @@ export class AtivoFinanceiroService {
                 : ativo.valorAtual;
             return entidadeToResponse({...ativo, valorAtual}, ativoFinanceiroResponseShema);
         });
+    }
+
+    async buscarAtivosPorClienteId(clienteId: string) {
+        const cliente = await this.clienteRepository.buscarPorId(clienteId);
+        if (!cliente) throw new ClienteNaoEncontradoError(`O cliente com id: ${clienteId} não foi encontrado`);
+
+        const ativos = await this.ativoFinanceiroRepository.buscarPorClienteId(clienteId);
+
+        return ativos.map(ativo => ({
+            ...ativo,
+            valorAtual: typeof ativo.valorAtual === "object" && "toNumber" in ativo.valorAtual
+                ? ativo.valorAtual.toNumber()
+                : ativo.valorAtual
+        }));
+    }
+
+    async buscarPorId(id: string) {
+        const ativoFinanceiro = await this.ativoFinanceiroRepository.buscarPorId(id);
+
+        if (!ativoFinanceiro) throw new AtivoFinanceiroNaoEncontrado(`O cliente com id: ${id} não foi encontrado`)
+
+        return entidadeToResponse(ativoFinanceiro, ativoFinanceiroResponseShema);
     }
 
     async criar(data: CriarAtivoFinanceiroInput) {
