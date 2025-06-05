@@ -22,6 +22,29 @@ export class AtivoFinanceiroRoutes {
         );
     }
 
+    async buscarPorClienteId(fastify: FastifyInstance) {
+        fastify.get<{Querystring: {clienteId: string}}>(
+            "/cliente",
+            {
+                schema: {
+                    querystring: {
+                        type: "object",
+                        properties: {
+                            clienteId: { type: "string" }
+                        },
+                        required: ["clienteId"]
+                    },
+                    response: {
+                        200: zodToJsonSchema(responseSchemaSucesso),
+                        404: zodToJsonSchema(responseSchemaErro),
+                        500: zodToJsonSchema(responseSchemaErro),
+                    },
+                },
+            },
+            (request, reply) => this.ativoFinanceiroController.buscarPorClienteIdHandler(request, reply)
+        );
+    }
+
     async criarAtivoFinanceiro(fastify: FastifyInstance) {
         fastify.post(
             "/criar",
