@@ -41,7 +41,7 @@ export class ClienteRoutes {
     }
 
     async atualizarCliente(fastify: FastifyInstance) {
-        fastify.put(
+        fastify.patch(
             "/atualizar/:id",
             {
                 schema: {
