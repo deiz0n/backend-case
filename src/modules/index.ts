@@ -16,7 +16,7 @@ export class ModuloPrincipal {
     private clienteRoutes = new ClienteRoutes(this.clienteController);
 
     private ativoFinanceiroRepository = new AtivoFinanceiroRepository();
-    private ativoFinanceiroService = new AtivoFinanceiroService(this.ativoFinanceiroRepository);
+    private ativoFinanceiroService = new AtivoFinanceiroService(this.ativoFinanceiroRepository, this.clienteRepository);
     private ativoFinanceiroController = new AtivoFinanceiroController(this.ativoFinanceiroService);
     private ativoFinanceiroRoutes = new AtivoFinanceiroRoutes(this.ativoFinanceiroController);
 
@@ -30,6 +30,7 @@ export class ModuloPrincipal {
         await fastify.register(async (instance) => {
             await this.ativoFinanceiroRoutes.criarAtivoFinanceiro(instance);
             await this.ativoFinanceiroRoutes.buscarTodos(instance);
+            await this.ativoFinanceiroRoutes.buscarPorClienteId(instance);
         }, { prefix: "/ativos-financeiros" });
     }
 }
